@@ -3,6 +3,8 @@
 // Copyright (c) 2010 Doug McInnes
 //
 
+var klein = false;
+
 KEY_CODES = {
   32: 'space',
   37: 'left',
@@ -13,7 +15,8 @@ KEY_CODES = {
   71: 'g',
   72: 'h',
   77: 'm',
-  80: 'p'
+  80: 'p',
+  84: 't'
 }
 
 KEY_STATUS = { keyDown:false };
@@ -353,8 +356,16 @@ Sprite = function () {
   this.wrapPostMove = function () {
     if (this.x > Game.canvasWidth) {
       this.x = 0;
+      if (klein) {
+        this.y = Game.canvasHeight - this.y; // klein bottle identifcation
+        this.vel.y = - this.vel.y;
+      }
     } else if (this.x < 0) {
       this.x = Game.canvasWidth;
+      if (klein) {
+        this.y = Game.canvasHeight - this.y;
+        this.vel.y = -this.vel.y;
+      }
     }
     if (this.y > Game.canvasHeight) {
       this.y = 0;
@@ -1188,6 +1199,11 @@ $(function () {
     if (paused) {
       Text.renderText('PAUSED', 72, Game.canvasWidth/2 - 160, 120);
     } else {
+      if (klein) {
+        Text.renderText('KLEIN', 72, Game.canvasWidth/2 - 160, 120);
+      } else {
+        Text.renderText('TORUS', 72, Game.canvasWidth/2 - 160, 120);
+      }
       requestAnimFrame(mainLoop, canvasNode);
     }
   };
@@ -1198,6 +1214,9 @@ $(function () {
     switch (KEY_CODES[e.keyCode]) {
       case 'f': // show framerate
         showFramerate = !showFramerate;
+        break;
+      case 't': // change topology
+        klein = !klein;
         break;
       case 'p': // pause
         paused = !paused;
